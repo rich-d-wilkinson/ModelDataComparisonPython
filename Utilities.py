@@ -5,6 +5,50 @@ import glob as glob
 from cmocean import cm as cm
 import numpy as np
 
+def plot_samples(vals, thinby, land_mask, levels=None):
+    """
+    Assumes we've used a particular thinby value on the gcm grid
+    """
+    # original GCM grid
+    lats_gcm = np.arange(-89.375,89.375,1.25) # Is this right?
+    longs_gcm = np.arange(-180,178.75+0.1, 1.25)
+    longgrid_gcm, latgrid_gcm = np.meshgrid(longs_gcm, lats_gcm)
+
+    keep_lats= np.arange(0,lats_gcm.size,thinby)
+    keep_longs= np.arange(0,longs_gcm.size,thinby)
+
+    # thinned GCM grid
+    longgrid_pred = longgrid_gcm[keep_lats,:][:,keep_longs]
+    latgrid_pred = latgrid_gcm[keep_lats,:][:,keep_longs]
+
+    # create an array of Falses, change the ocean values to true, then thin
+    land_mask_TF = np.zeros(longgrid_gcm.shape, dtype=bool)
+    tmp = land_mask_TF.flatten()
+    tmp[land_mask-1]=True
+    land_mask_TF = tmp.reshape(longgrid_gcm.shape)
+    land_mask_TF_pred = land_mask_TF[keep_lats,:][:,keep_longs]
+
+    yplot = np.zeros(land_mask_TF_pred.size)-10000.
+    yplot[land_mask_TF_pred.flatten()] = vals # IS THIS RIGHT?
+    gcm_grid = yplot.reshape(land_mask_TF_pred.shape)
+
+
+    mp2 = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,\
+            llcrnrlon=-180,urcrnrlon=180,resolution='c')
+    mp2.drawcoastlines()
+    mp2.drawparallels(np.arange(-90.,91.,30.))
+    mp2.drawmeridians(np.arange(-180.,181.,60.))
+    mp2.drawmapboundary(fill_color='white')
+
+    if levels==None:
+        levels = np.arange(-10,12,1)
+
+    #mp2.scatter(longgrid_pred.flatten(), latgrid_pred.flatten())
+    mp2.contourf(longgrid_pred,latgrid_pred, gcm_grid,15,levels=levels,
+        cm = cm.delta)
+    mp2.colorbar()
+    mp2.fillcontinents('black')
+    return(mp2)
 
 def plot_gcm(vals, land_mask, X_obs=None, levels=None):
     lats = np.arange(-89.375,89.375,1.25)
@@ -27,6 +71,8 @@ def plot_gcm(vals, land_mask, X_obs=None, levels=None):
     cm = cm.delta)
     m.fillcontinents('black')
     m.colorbar()
+
+
     if X_obs is not None:
         mp2.scatter(X_obs[:,0], X_obs[:,1])
     return(m)

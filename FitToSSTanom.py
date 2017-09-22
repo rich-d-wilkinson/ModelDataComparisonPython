@@ -166,6 +166,9 @@ To do
 - do the tests we discussed
 - describe problem with ARD kernel.
 - robust scoring rules?
+- compare to MSE
+- check likelihood calculation - seems to not be robust to thinning of the grid.
+
 """
 
 
