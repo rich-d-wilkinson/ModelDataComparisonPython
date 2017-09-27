@@ -95,7 +95,7 @@ def plot_map(longgrid=None, latgrid=None, vals=None, X_obs=None, levels=None):
     cm = cm.delta)
         mp2.colorbar()
 
-    mp2.fillcontinents('black')
+    mp2.fillcontinents('green')
 
     if X_obs is not None:
         mp2.scatter(X_obs[:,0], X_obs[:,1])
@@ -122,6 +122,7 @@ def ThinGrid(gcm_output, land_mask, thinby=2, plot=False):
     lats_gcm = np.arange(-89.375,89.375,1.25) # Is this right?
     longs_gcm = np.arange(-180,178.75+0.1, 1.25)
     longgrid_gcm, latgrid_gcm = np.meshgrid(longs_gcm, lats_gcm)
+
     yplot = np.zeros(longgrid_gcm.size)-10000.
     yplot[land_mask-1] = gcm_output # IS THIS RIGHT?
     gcm_grid = yplot.reshape(lats_gcm.size,longs_gcm.size)
@@ -156,6 +157,6 @@ def ThinGrid(gcm_output, land_mask, thinby=2, plot=False):
 
     # return the thinned GCM output.
     gcm_grid_pred_S = gcm_grid_pred.flatten()[land_mask_TF_pred.flatten()]
-    if gcm_grid_pred_S.min()<-1000:
+    if gcm_grid_pred_S.min()<-100.:
         print('Error we have not remvoved all the land successfully')
     return X_pred, gcm_grid_pred_S[:,None]

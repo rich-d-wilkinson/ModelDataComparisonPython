@@ -125,16 +125,20 @@ map=plot_map(longgridplot, latgridplot, V3, X_obs, levels=np.arange(0,V3.max()+1
 #
 ############################################################
 
-count=0
-loglikes = np.zeros(len(gcm_SSTs))
 from scipy.stats import multivariate_normal
 
+count=0
+loglikes = np.zeros(len(gcm_SSTs))
+
 #
-tmp = np.column_stack((gcm_grid, gcm_grid))
-multivariate_normal.logpdf(tmp.T, mu.flatten(), Cov)
+#tmp = np.column_stack((gcm_grid, gcm_grid))
+#multivariate_normal.logpdf(tmp.T, mu.flatten(), Cov)
 # Is quicker
 
 # Best we can hope for is...
+
+from Cholesky import *
+
 multivariate_normal.logpdf(mu.flatten(), mu.flatten(), Cov)
 
 # What else can we compare with?
